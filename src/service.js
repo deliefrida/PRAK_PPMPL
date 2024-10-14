@@ -1,12 +1,10 @@
-const Repository = require('./repository');
+const PrimaryRepository = require('./repository'); // pastikan path benar
+const SecondaryRepository = require('./SecondaryRepository'); // pastikan path benar
 
 class Service {
   constructor() {
-    this.repository = new Repository();
-  }
-
-  getAllItems() {
-    return this.repository.getAllItems();
+    this.primaryRepository = new PrimaryRepository();
+    this.secondaryRepository = new SecondaryRepository();
   }
 
   getItemById(id) {
@@ -20,9 +18,15 @@ class Service {
     return item;
   }
 
-  addItem(name) {
-    const newItem = { id: this.repository.data.length + 1, name };
-    return this.repository.addItem(newItem);
+  deleteItemById(id) {
+    let item = this.primaryRepository.deleteItemById(id);
+    if (!item) {
+      item = this.secondaryRepository.deleteItemById(id);
+    }
+    if (!item) {
+      throw new Error('Item not found'); // Menghandle error jika item tidak ditemukan di kedua repository
+    }
+    return item;
   }
 }
 
